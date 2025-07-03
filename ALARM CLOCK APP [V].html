@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chromatra Alarm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff5e7d;
+            --secondary: #47bfff;
+            --accent: #a55eea;
+            --background: #1a1a2e;
+            --text: #f8f8f8;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --error: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            background-image: radial-gradient(circle at 80% 20%, rgba(255, 94, 125, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 20% 80%, rgba(71, 191, 255, 0.1) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: rgba(248, 248, 248, 0.7);
+            font-size: 1rem;
+        }
+
+        .time-display {
+            background: rgba(30, 30, 50, 0.5);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .current-time {
+            font-size: 3.5rem;
+            font-weight: 600;
+            background: linear-gradient(to right, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .current-date {
+            font-size: 1rem;
+            color: rgba(248, 248, 248, 0.7);
+        }
+
+        .alarm-form {
+            background: rgba(30, 30, 50, 0.5);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            display: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--secondary);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(248, 248, 248, 0.8);
+        }
+
+        input[type="time"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input[type="time"]:focus {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        select:focus {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 94, 125, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+        }
+
+        .add-alarm-btn {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(165, 94, 234, 0.3);
+        }
+
+        .add-alarm-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(165, 94, 234, 0.4);
+        }
+
+        .alarms-list {
+            background: rgba(30, 30, 50, 0.5);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .alarms-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+            text-align: center;
+        }
+
+        .alarm-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(20, 20, 40, 0.6);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .alarm-item:hover {
+            background: rgba(30, 30, 60, 0.8);
+        }
+
+        .alarm-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .alarm-time {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .alarm-label {
+            font-size: 0.8rem;
+            color: rgba(248, 248, 248, 0.7);
+        }
+
+        .alarm-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .delete-btn {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--error);
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.7rem;
+        }
+
+        .delete-btn:hover {
+            background: rgba(231, 76, 60, 0.4);
+        }
+
+        .no-alarms {
+            text-align: center;
+            color: rgba(248, 248, 248, 0.5);
+            padding: 20px;
+        }
+
+        .alarm-active {
+            border-left: 5px solid var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+            }
+        }
+
+        .alarm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            display: none;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--background), #22223b);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            animation: scaleUp 0.3s ease-out;
+        }
+
+        @keyframes scaleUp {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .modal-time {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .snooze-btn {
+            background: var(--warning);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .snooze-btn:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        .dismiss-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dismiss-btn:hover {
+            background: #ff4757;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .current-time {
+                font-size: 2.5rem;
+            }
+            
+            .alarm-time {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Rainbow animation */
+        .rainbow-text {
+            background: linear-gradient(90deg, #ff5e7d, #ff8a5b, #ffba5a, #8dec5a, #5ae9ff, #5d5aff, #be5aff);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: rainbow 10s ease infinite;
+        }
+
+        @keyframes rainbow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="rainbow-text">Chromatra Alarm</h1>
+            <p>Wake up in color</p>
+        </div>
+
+        <div class="time-display">
+            <div class="current-time" id="current-time">00:00:00</div>
+            <div class="current-date" id="current-date">Monday, January 1, 2023</div>
+        </div>
+
+        <button class="add-alarm-btn" id="add-alarm-btn">+ Add New Alarm</button>
+
+        <div class="alarm-form" id="alarm-form">
+            <h2 class="form-title">Set New Alarm</h2>
+            <div class="form-group">
+                <label for="alarm-time">Alarm Time</label>
+                <input type="time" id="alarm-time" required>
+            </div>
+            <div class="form-group">
+                <label for="alarm-label">Label (Optional)</label>
+                <input type="text" id="alarm-label" placeholder="Morning Alarm">
+            </div>
+            <div class="form-group">
+                <label for="alarm-tone">Alarm Tone</label>
+                <select id="alarm-tone">
+                    <option value="1">Chime</option>
+                    <option value="2">Beep</option>
+                    <option value="3">Digital</option>
+                    <option value="4">Nature</option>
+                </select>
+            </div>
+            <button class="btn" id="save-alarm-btn">Save Alarm</button>
+            <button class="btn btn-secondary" id="cancel-alarm-btn">Cancel</button>
+        </div>
+
+        <div class="alarms-list">
+            <h2 class="alarms-title">Your Alarms</h2>
+            <div id="alarms-container">
+                <div class="no-alarms" id="no-alarms">No alarms set</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alarm-modal" id="alarm-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Wake Up!</h2>
+            <div class="modal-time" id="modal-time">08:00 AM</div>
+            <audio id="alarm-sound" loop>
+                <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" type="audio/mpeg">
+            </audio>
+            <div class="modal-actions">
+                <button class="snooze-btn" id="snooze-btn">Snooze (5 min)</button>
+                <button class="dismiss-btn" id="dismiss-btn">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const currentTimeElement = document.getElementById('current-time');
+        const currentDateElement = document.getElementById('current-date');
+        const addAlarmBtn = document.getElementById('add-alarm-btn');
+        const alarmForm = document.getElementById('alarm-form');
+        const saveAlarmBtn = document.getElementById('save-alarm-btn');
+        const cancelAlarmBtn = document.getElementById('cancel-alarm-btn');
+        const alarmsContainer = document.getElementById('alarms-container');
+        const noAlarmsElement = document.getElementById('no-alarms');
+        const alarmModal = document.getElementById('alarm-modal');
+        const modalTimeElement = document.getElementById('modal-time');
+        const snoozeBtn = document.getElementById('snooze-btn');
+        const dismissBtn = document.getElementById('dismiss-btn');
+        const alarmSound = document.getElementById('alarm-sound');
+
+        // Global variables
+        let alarms = JSON.parse(localStorage.getItem('alarms')) || [];
+        let activeAlarm = null;
+        let snoozeTimeout = null;
+
+        // Update time every second
+        function updateTime() {
+            const now = new Date();
+            
+            // Format time
+            let hours = now.getHours();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            
+            currentTimeElement.textContent = `${hours}:${minutes}:${seconds} ${ampm}`;
+            
+            // Format date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            currentDateElement.textContent = now.toLocaleDateString('en-US', options);
+            
+            // Check alarms
+            checkAlarms(now);
+        }
+
+        // Check if any alarm should trigger
+        function checkAlarms(currentTime) {
+            alarms.forEach(alarm => {
+                if (!alarm.active) return;
+                
+                const alarmTime = new Date(alarm.time);
+                
+                // Compare hours and minutes, ignore seconds
+                if (alarmTime.getHours() === currentTime.getHours() &&
+                    alarmTime.getMinutes() === currentTime.getMinutes() &&
+                    !alarm.triggered) {
+                    
+                    triggerAlarm(alarm);
+                    alarm.triggered = true;
+                    saveAlarms();
+                    updateAlarmsList();
+                }
+            });
+        }
+
+        // Trigger the alarm
+        function triggerAlarm(alarm) {
+            activeAlarm = alarm;
+            
+            // Set modal time
+            modalTimeElement.textContent = formatTimeForDisplay(new Date(alarm.time));
+            
+            // Play sound
+            alarmSound.currentTime = 0;
+            alarmSound.play();
+            
+            // Show modal
+            alarmModal.style.display = 'flex';
+        }
+
+        // Format time for display in alarms list
+        function formatTimeForDisplay(time) {
+            let hours = time.getHours();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const minutes = time.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes} ${ampm}`;
+        }
+
+        // Toggle alarm active/inactive
+        function toggleAlarm(index) {
+            alarms[index].active = !alarms[index].active;
+            alarms[index].triggered = false;
+            saveAlarms();
+            updateAlarmsList();
+        }
+
+        // Delete an alarm
+        function deleteAlarm(index) {
+            alarms.splice(index, 1);
+            saveAlarms();
+            updateAlarmsList();
+        }
+
+        // Save alarms to localStorage
+        function saveAlarms() {
+            localStorage.setItem('alarms', JSON.stringify(alarms));
+        }
+
+        // Update the alarms list UI
+        function updateAlarmsList() {
+            if (alarms.length === 0) {
+                noAlarmsElement.style.display = 'block';
+                alarmsContainer.innerHTML = '';
+            } else {
+                noAlarmsElement.style.display = 'none';
+                
+                alarmsContainer.innerHTML = alarms.map((alarm, index) => {
+                    const alarmTime = new Date(alarm.time);
+                    const alarmClass = alarm.active ? 'alarm-item alarm-active' : 'alarm-item';
+                    
+                    return `
+                        <div class="${alarmClass}" id="alarm-${index}">
+                            <div class="alarm-info">
+                                <div class="alarm-time">${formatTimeForDisplay(alarmTime)}</div>
+                                <div class="alarm-label">${alarm.label || 'Alarm'}</div>
+                            </div>
+                            <div class="alarm-controls">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" ${alarm.active ? 'checked' : ''}>
+                                    <span class="slider"></span>
+                                </label>
+                                <button class="delete-btn" data-index="${index}">×</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Add event listeners for toggles and delete buttons
+                alarms.forEach((alarm, index) => {
+                    const toggle = document.querySelector(`#alarm-${index} .toggle-switch input`);
+                    const deleteBtn = document.querySelector(`#alarm-${index} .delete-btn`);
+                    
+                    toggle.addEventListener('change', () => toggleAlarm(index));
+                    deleteBtn.addEventListener('click', () => deleteAlarm(index));
+                });
+            }
+        }
+
+        // Event listeners
+        addAlarmBtn.addEventListener('click', () => {
+            alarmForm.style.display = 'block';
+            addAlarmBtn.style.display = 'none';
+        });
+
+        cancelAlarmBtn.addEventListener('click', () => {
+            alarmForm.style.display = 'none';
+            addAlarmBtn.style.display = 'block';
+        });
+
+        saveAlarmBtn.addEventListener('click', () => {
+            const timeInput = document.getElementById('alarm-time').value;
+            const labelInput = document.getElementById('alarm-label').value;
+            const toneInput = document.getElementById('alarm-tone').value;
+            
+            if (!timeInput) {
+                alert('Please set a time for the alarm');
+                return;
+            }
+            
+            const [hours, minutes] = timeInput.split(':');
+            const alarmTime = new Date();
+            alarmTime.setHours(hours);
+            alarmTime.setMinutes(minutes);
+            alarmTime.setSeconds(0);
+            
+            const newAlarm = {
+                time: alarmTime.toISOString(),
+                label: labelInput,
+                tone: toneInput,
+                active: true,
+                triggered: false
+            };
+            
+            alarms.push(newAlarm);
+            saveAlarms();
+            updateAlarmsList();
+            
+            // Reset form
+            document.getElementById('alarm-time').value = '';
+            document.getElementById('alarm-label').value = '';
+            document.getElementById('alarm-tone').selectedIndex = 0;
+            
+            alarmForm.style.display = 'none';
+            addAlarmBtn.style.display = 'block';
+        });
+
+        snoozeBtn.addEventListener('click', () => {
+            if (!activeAlarm) return;
+            
+            // Stop sound
+            alarmSound.pause();
+            
+            // Hide modal
+            alarmModal.style.display = 'none';
+            
+            // Set snooze
+            const alarmIndex = alarms.findIndex(a => a.time === activeAlarm.time);
+            if (alarmIndex !== -1) {
+                alarms[alarmIndex].triggered = false;
+                
+                // Add 5 minutes to the alarm time
+                const alarmTime = new Date(activeAlarm.time);
+                alarmTime.setMinutes(alarmTime.getMinutes() + 5);
+                alarms[alarmIndex].time = alarmTime.toISOString();
+                
+                saveAlarms();
+                updateAlarmsList();
+            }
+            
+            activeAlarm = null;
+        });
+
+        dismissBtn.addEventListener('click', () => {
+            if (!activeAlarm) return;
+            
+            // Stop sound
+            alarmSound.pause();
+            
+            // Hide modal
+            alarmModal.style.display = 'none';
+            
+            // Mark alarm as triggered but not active
+            const alarmIndex = alarms.findIndex(a => a.time === activeAlarm.time);
+            if (alarmIndex !== -1) {
+                alarms[alarmIndex].active = false;
+                alarms[alarmIndex].triggered = true;
+                
+                saveAlarms();
+                updateAlarmsList();
+            }
+            
+            activeAlarm = null;
+        });
+
+        // Initialize
+        updateTime();
+        setInterval(updateTime, 1000);
+        updateAlarmsList();
+    </script>
+</body>
+</html>
